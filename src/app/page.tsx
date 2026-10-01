@@ -6,14 +6,23 @@ import { Solutions } from "@/components/home/solutions";
 import { Testimonials } from "@/components/home/testimonials";
 import { ProductCarousel } from "@/components/product/product-carousel";
 import { ProductGridSection } from "@/components/product/product-grid-section";
-import { bestSellers, newArrivals } from "@/lib/products";
+import { getBestSellers, getFeaturedCategories, getNewArrivals } from "@/db/queries/catalog";
 
-export default function Home() {
+// Rebuild with fresh catalog and stock data at most every 5 minutes.
+export const revalidate = 300;
+
+export default async function Home() {
+  const [categories, newArrivals, bestSellers] = await Promise.all([
+    getFeaturedCategories(),
+    getNewArrivals(),
+    getBestSellers(),
+  ]);
+
   return (
     <>
       <Hero />
       <Benefits />
-      <FeaturedCollections />
+      <FeaturedCollections categories={categories} />
       <ProductCarousel
         eyebrow="Just landed"
         title="New arrivals"

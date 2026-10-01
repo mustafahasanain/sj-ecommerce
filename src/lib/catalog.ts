@@ -1,19 +1,10 @@
 /*
- * Sample storefront data used until the catalog lives in the database.
+ * Static storefront content: site settings, navigation and marketing copy.
  * Photos are from Unsplash (https://unsplash.com/license).
- * Product data lives in ./products.ts.
+ * Categories, products and stock live in the database (src/db/schema.ts).
  */
 
 import { unsplash } from "./unsplash";
-
-export type Collection = {
-  slug: string;
-  name: string;
-  blurb: string;
-  productCount: number;
-  image: string;
-  imageAlt: string;
-};
 
 export type Solution = {
   title: string;
@@ -53,41 +44,6 @@ export const hero = {
   image: unsplash("1558494949-ef010cbdcc31", 2400),
   imageAlt: "Neatly routed network cables in a dark server rack",
 };
-
-export const collections: Collection[] = [
-  {
-    slug: "wifi-mesh",
-    name: "Wi-Fi & Mesh",
-    blurb: "Whole-home coverage with Wi-Fi 7 routers and mesh nodes.",
-    productCount: 24,
-    image: unsplash("1745847768408-b7b83796cae6", 1600),
-    imageAlt: "Close-up of a black wireless router with raised antennas",
-  },
-  {
-    slug: "switching",
-    name: "Switching",
-    blurb: "Managed and unmanaged switches from 5 to 48 ports.",
-    productCount: 31,
-    image: unsplash("1594915440248-1e419eba6611"),
-    imageAlt: "Fiber optic cables patched into a rack-mounted network switch",
-  },
-  {
-    slug: "security",
-    name: "Security",
-    blurb: "Indoor and outdoor cameras with local recording.",
-    productCount: 18,
-    image: unsplash("1589935447067-5531094415d1"),
-    imageAlt: "Two white security cameras mounted on a pole against a blue sky",
-  },
-  {
-    slug: "accessories",
-    name: "Cabling & Accessories",
-    blurb: "Patch cables, hubs and power for a tidy setup.",
-    productCount: 56,
-    image: unsplash("1683322499436-f4383dd59f5a"),
-    imageAlt: "Bundles of blue ethernet cables fanning out in low light",
-  },
-];
 
 export const editorial = {
   eyebrow: "Designed for small business",

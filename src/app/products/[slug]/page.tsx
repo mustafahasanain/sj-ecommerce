@@ -10,31 +10,26 @@ import { ProductGridSection } from "@/components/product/product-grid-section";
 import { PurchasePanel } from "@/components/product/purchase-panel";
 import { Rating } from "@/components/product/rating";
 import { StockStatus } from "@/components/product/stock-status";
+import { getProductBySlug, getProductSlugs, getRelatedProducts } from "@/db/queries/catalog";
 import { site } from "@/lib/catalog";
-import {
-  formatPrice,
-  getCategoryName,
-  getProduct,
-  getProductBadges,
-  getRelatedProducts,
-  getStockState,
-  products,
-  type Product,
-} from "@/lib/products";
+import { formatPrice, getProductBadges, getStockState, type Product } from "@/lib/products";
 
 const MAX_PER_ORDER = 10;
 
-// Only catalog products exist; anything else is a 404.
-export const dynamicParams = false;
+// Products added after a build render on first request; unknown slugs 404 below.
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+// Refresh price and stock at most every 5 minutes.
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  return (await getProductSlugs()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/products/[slug]">): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await getProductBySlug((await params).slug);
   if (!product) return {};
 
   return {
@@ -49,11 +44,12 @@ export async function generateMetadata({
 }
 
 export default async function ProductPage({ params }: PageProps<"/products/[slug]">) {
-  const product = getProduct((await params).slug);
+  const product = await getProductBySlug((await params).slug);
   if (!product) notFound();
 
-  const categoryName = getCategoryName(product.category);
-  const categoryHref = `/collections/${product.category}`;
+  const categoryName = product.category.name;
+  const categoryHref = `/collections/${product.category.slug}`;
+  const relatedProducts = await getRelatedProducts(product);
   const stockState = getStockState(product);
   const soldOut = stockState === "out-of-stock";
   const savings = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
@@ -187,7 +183,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
         eyebrow={`More in ${categoryName}`}
         title="You may also like"
         href={categoryHref}
-        products={getRelatedProducts(product)}
+        products={relatedProducts}
       />
     </>
   );

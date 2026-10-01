@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { collections } from "@/lib/catalog";
+import type { FeaturedCategory } from "@/db/queries/catalog";
 
 // Bento layout: one hero tile, one wide tile, two small tiles.
 const tileLayout = [
@@ -11,7 +11,7 @@ const tileLayout = [
   { tile: "aspect-square lg:aspect-auto", sizes: "(min-width: 1024px) 25vw, 50vw", large: false },
 ];
 
-export function FeaturedCollections() {
+export function FeaturedCollections({ categories }: { categories: FeaturedCategory[] }) {
   return (
     <section className="section-y">
       <div className="container-page">
@@ -26,34 +26,36 @@ export function FeaturedCollections() {
         </div>
 
         <ul className="grid grid-cols-2 gap-grid lg:h-[40rem] lg:grid-cols-4 lg:grid-rows-2">
-          {collections.map((collection, index) => {
+          {categories.map((category, index) => {
             const layout = tileLayout[index % tileLayout.length];
 
             return (
-              <li key={collection.slug} className={`relative ${layout.tile}`}>
+              <li key={category.slug} className={`relative ${layout.tile}`}>
                 <Link
-                  href={`/collections/${collection.slug}`}
+                  href={`/collections/${category.slug}`}
                   className="group absolute inset-0 isolate flex flex-col justify-end overflow-hidden rounded-card bg-chrome p-4 text-on-chrome sm:p-6"
                 >
-                  <Image
-                    src={collection.image}
-                    alt={collection.imageAlt}
-                    fill
-                    sizes={layout.sizes}
-                    className="-z-10 object-cover transition-[scale] duration-500 group-hover:scale-105"
-                  />
+                  {category.imageUrl && (
+                    <Image
+                      src={category.imageUrl}
+                      alt={category.imageAlt ?? ""}
+                      fill
+                      sizes={layout.sizes}
+                      className="-z-10 object-cover transition-[scale] duration-500 group-hover:scale-105"
+                    />
+                  )}
                   <div
                     aria-hidden="true"
                     className="absolute inset-0 -z-10 bg-linear-to-t from-black/85 via-black/45 to-black/5"
                   />
                   <p className="text-xs font-medium text-on-chrome-muted sm:text-sm">
-                    {collection.productCount} products
+                    {category.productCount} {category.productCount === 1 ? "product" : "products"}
                   </p>
                   <h3 className={layout.large ? "mt-1 text-h2 text-on-chrome" : "mt-1 text-lg font-medium text-on-chrome sm:text-h3"}>
-                    {collection.name}
+                    {category.name}
                   </h3>
                   <p className={`mt-2 max-w-sm text-sm text-on-chrome-muted ${layout.large ? "" : "hidden sm:block"}`}>
-                    {collection.blurb}
+                    {category.description}
                   </p>
                   <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium sm:mt-4">
                     Shop now
